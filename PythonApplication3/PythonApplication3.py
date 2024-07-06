@@ -36,7 +36,7 @@ def custom_svd(A):
     return U, Σ, V_T
 
 # Example usage
-A = np.array([[2, 1], [0, 1]], dtype=float)
+A = np.array([[1, 2], [3, 4]], dtype=float)
 U, Σ, V_T = custom_svd(A)
 
 # Verify the decomposition
