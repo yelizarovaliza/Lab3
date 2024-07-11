@@ -8,10 +8,8 @@ import matplotlib.pyplot as plt
 ratings_path = pd.read_csv('ratings.csv')
 movies_path = pd.read_csv('movies.csv')
 
-# Створення матриці рейтингів
 ratings_matrix = ratings_path.pivot(index='userId', columns='movieId', values='rating')
 
-# Фільтрація користувачів, що оцінили менше 200 фільмів, та фільмів з менше 100 оцінками
 ratings_matrix1 = ratings_matrix.dropna(thresh=200, axis=0)
 ratings_matrix2 = ratings_matrix.dropna(thresh=100, axis=1)
 
@@ -46,8 +44,8 @@ def plot_movies(Vt):
 plot_users(U[:20, :])
 plot_movies(Vt[:, :20])
 
-# 2 part
 
+# 2 part
 def perform_pred(ratings_matrix, k):
     U, sigma, Vt, user_ratings_mean = svd_ratings(ratings_matrix, k)
     all_user_predicted_ratings = np.dot(np.dot(U, np.diag(sigma)), Vt) + user_ratings_mean.reshape(-1, 1)    
@@ -61,7 +59,7 @@ U1, sigma1, Vt1, user_ratings_mean1 = svd_ratings(ratings_matrix4, 3)
 
 K = [3, 5, 10, 25, 50, 100]
 errors = []
-
+# варіації для розних к
 for k in K:
     preds = perform_pred(ratings_matrix, k)
     start_ratings = ratings_matrix.values
@@ -70,7 +68,8 @@ for k in K:
     mse = mean_squared_error(start_ratings[mask], predict_ratings[mask])
     errors.append(mse)
     print(f'k = {k}, Mean Squared Error: {mse}')
-
+    
+# побудова графіку
 plt.plot(K, errors, marker='o')
 plt.xlabel('k (Number of latent factors)')
 plt.ylabel('Mean Squared Error')
@@ -85,6 +84,7 @@ print(final_preds_df)
 print("Predicted ratings only:")
 print(preds_only_df)
 
+# таблиця рекомендацій
 def recom_movies_for_user(preds_only_df, user_id, num_recommend=10):
     user_row = preds_only_df.loc[user_id].dropna().sort_values(ascending=False).head(num_recommend)
     titles = movies_path.set_index('movieId').loc[user_row.index]
