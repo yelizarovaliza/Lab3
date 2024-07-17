@@ -11,7 +11,6 @@ def custom_svd(A):
     eigval_AAT, eigvect_AAT = np.linalg.eig(AAT)
     eigval_ATA, eigvect_ATA = np.linalg.eig(ATA)
 
-    # Sort eigenvalues and eigenvectors
     sorted_indices_AAT = np.argsort(eigval_AAT)[::-1]
     sorted_indices_ATA = np.argsort(eigval_ATA)[::-1]
 
@@ -21,18 +20,21 @@ def custom_svd(A):
     eigval_ATA = eigval_ATA[sorted_indices_ATA]
     eigvect_ATA = eigvect_ATA[:, sorted_indices_ATA]
 
-    # Form the Σ
-    singular_values = np.sqrt(np.maximum(eigval_ATA, 0))
-    min_dim = min(m, n)
-    Σ = np.zeros((min_dim, min_dim))
-    np.fill_diagonal(Σ, singular_values[:min_dim])
+    singular_values = np.sqrt(np.maximum(eigval_AAT, 0))
+    Σ = np.zeros((m, n))
+    np.fill_diagonal(Σ, singular_values[:min(m, n)])
 
-    U = eigvect_AAT[:, :min_dim]
-    V = eigvect_ATA[:, :min_dim]
+    U = eigvect_AAT
 
-    for i in range(min_dim):
-        if singular_values[i] > 1e-10:  # avoid division by zero for very small singular values
+    V = eigvect_ATA
+
+    for i in range(min(m, n)):
+        if singular_values[i] > 1e-10:  # avoid division by zero
             U[:, i] = np.dot(A, V[:, i]) / singular_values[i]
+
+    # U and V are orthogonal
+    U, _ = np.linalg.qr(U)
+    V, _ = np.linalg.qr(V)
 
     return U, Σ, V.T
 
